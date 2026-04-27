@@ -1,137 +1,225 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0a0e18"/>
-      <stop offset="1" stop-color="#1a2330"/>
+    <linearGradient id="bg-base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#06080f"/>
+      <stop offset="1" stop-color="#0a0e1a"/>
     </linearGradient>
-    <radialGradient id="glow" cx="0.85" cy="0.15" r="0.6">
-      <stop offset="0" stop-color="#1a2330" stop-opacity="0"/>
-      <stop offset="1" stop-color="#000" stop-opacity="0.4"/>
+
+    <radialGradient id="orb-blue" cx="0.18" cy="0.22" r="0.55">
+      <stop offset="0" stop-color="#1e3a8a" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#1e3a8a" stop-opacity="0"/>
     </radialGradient>
-    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
-      <circle cx="2" cy="2" r="1" fill="#fff" fill-opacity="0.04"/>
+    <radialGradient id="orb-cyan" cx="0.92" cy="0.05" r="0.45">
+      <stop offset="0" stop-color="#0e7490" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#0e7490" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="orb-violet" cx="0.72" cy="1.05" r="0.6">
+      <stop offset="0" stop-color="#5b21b6" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#5b21b6" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="0.5" cy="0.5" r="0.85">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity="0.45"/>
+    </radialGradient>
+
+    <linearGradient id="card-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22252d"/>
+      <stop offset="1" stop-color="#13151b"/>
+    </linearGradient>
+    <linearGradient id="card-stroke" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.16"/>
+      <stop offset="0.5" stop-color="#fff" stop-opacity="0.05"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <linearGradient id="title-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#94a3b8"/>
+    </linearGradient>
+
+    <pattern id="dots" width="44" height="44" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="0.7" fill="#fff" fill-opacity="0.025"/>
     </pattern>
-    <filter id="card-shadow" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="6"/>
-      <feOffset dy="6" result="offset"/>
-      <feComponentTransfer><feFuncA type="linear" slope="0.4"/></feComponentTransfer>
+
+    <filter id="deep-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="20"/>
+      <feOffset dy="18"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.55"/></feComponentTransfer>
       <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
     </filter>
   </defs>
 
-  <rect width="1280" height="640" fill="url(#bg)"/>
+  <!-- ─── Background ─────────────────────────────────── -->
+  <rect width="1280" height="640" fill="url(#bg-base)"/>
+  <rect width="1280" height="640" fill="url(#orb-blue)"/>
+  <rect width="1280" height="640" fill="url(#orb-cyan)"/>
+  <rect width="1280" height="640" fill="url(#orb-violet)"/>
   <rect width="1280" height="640" fill="url(#dots)"/>
-  <rect width="1280" height="640" fill="url(#glow)"/>
+  <rect width="1280" height="640" fill="url(#vignette)"/>
 
-  <!-- ─── Title ─── -->
-  <g transform="translate(72, 96)" font-family="Inter, system-ui, -apple-system, sans-serif">
-    <text font-size="88" font-weight="800" fill="#ffffff" letter-spacing="-3">lessplasma</text>
-    <text y="58" font-size="22" font-weight="400" fill="#ffffff" fill-opacity="0.55" letter-spacing="0.5">
-      Minimal widgets for KDE Plasma 6.
-    </text>
-    <text y="98" font-size="14" font-weight="500" fill="#5AC8FA" letter-spacing="3">EIGHT WIDGETS · ONE AESTHETIC · ZERO BLOAT</text>
+  <!-- ─── Left: title block ──────────────────────────── -->
+  <g transform="translate(80, 200)" font-family="Inter, system-ui, -apple-system, sans-serif">
+
+    <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+      <text fill="#5AC8FA">~</text>
+      <text x="16" fill="#fff" fill-opacity="0.55">kde plasma 6 · v0.1</text>
+    </g>
+
+    <text y="98" font-size="108" font-weight="200" fill="url(#title-grad)" letter-spacing="-4">lessplasma</text>
+
+    <text y="146" font-size="24" font-weight="300" fill="#fff" fill-opacity="0.7" letter-spacing="-0.3">Minimal widgets for KDE Plasma 6.</text>
+    <text y="176" font-size="15" font-weight="300" fill="#fff" fill-opacity="0.4" letter-spacing="0">Eight widgets. One aesthetic. Zero bloat.</text>
+
+    <line x1="0" y1="216" x2="48" y2="216" stroke="#5AC8FA" stroke-width="2.5" stroke-linecap="round"/>
+
+    <g transform="translate(0, 250)" font-size="12" fill="#fff" fill-opacity="0.5" font-weight="500">
+      <text>Screen Time · Sticky Note · System Pulse · Disk Usage</text>
+      <text y="22">Calendar Strip · WiFi QR · Public IP · Bar Clock</text>
+    </g>
+
+    <text y="332" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="12" fill="#fff" fill-opacity="0.4">github.com/Sha547/lessplasma</text>
   </g>
 
-  <!-- ─── Widget mockups (right side cluster) ─── -->
-  <g transform="translate(720, 80)">
+  <!-- ─── Right: stacked widget showcase ─────────────── -->
+  <g transform="translate(700, 80)">
 
-    <!-- Screen Time card (large, top-left) -->
-    <g transform="translate(0, 0)" filter="url(#card-shadow)">
-      <rect width="240" height="200" rx="18" fill="#1c1c1e"/>
-      <text x="20" y="40" font-family="Inter, sans-serif" font-size="24" font-weight="700" fill="#fff">3h 1m</text>
+    <!-- Layer 1 (back): System Pulse pill -->
+    <g transform="translate(0, 24)">
+      <g filter="url(#deep-shadow)">
+        <rect width="320" height="76" rx="38" fill="url(#card-bg)"/>
+        <rect x="0.5" y="0.5" width="319" height="75" rx="37.5" fill="none" stroke="url(#card-stroke)" stroke-width="1"/>
+      </g>
+      <g transform="translate(28, 0)" font-family="Inter, sans-serif">
+        <text x="0" y="32" font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5" letter-spacing="1.5">CPU</text>
+        <text x="36" y="32" font-size="13" font-weight="700" fill="#fff">23%</text>
+        <rect x="0" y="42" width="68" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
+        <rect x="0" y="42" width="16" height="4" rx="2" fill="#34C759"/>
 
-      <!-- mini chart bars -->
-      <g transform="translate(20, 70)">
-        <rect x="0" y="40" width="3" height="12" rx="1" fill="#5AC8FA"/>
-        <rect x="0" y="32" width="3" height="8" rx="1" fill="#FF9F0A"/>
-        <rect x="14" y="20" width="3" height="32" rx="1" fill="#5AC8FA"/>
-        <rect x="14" y="14" width="3" height="6" rx="1" fill="#FF9F0A"/>
-        <rect x="28" y="48" width="3" height="4" rx="1" fill="#5AC8FA"/>
-        <rect x="70" y="22" width="3" height="30" rx="1" fill="#5AC8FA"/>
-        <rect x="84" y="18" width="3" height="34" rx="1" fill="#5AC8FA"/>
-        <rect x="98" y="50" width="3" height="2" rx="1" fill="#34C759"/>
-        <rect x="156" y="40" width="3" height="12" rx="1" fill="#FF9F0A"/>
-        <rect x="170" y="35" width="3" height="17" rx="1" fill="#FF9F0A"/>
-        <line x1="-2" y1="52" x2="200" y2="52" stroke="#fff" stroke-opacity="0.06"/>
+        <text x="100" y="32" font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5" letter-spacing="1.5">RAM</text>
+        <text x="138" y="32" font-size="13" font-weight="700" fill="#fff">61%</text>
+        <rect x="100" y="42" width="68" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
+        <rect x="100" y="42" width="42" height="4" rx="2" fill="#FF9F0A"/>
+
+        <text x="200" y="32" font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5" letter-spacing="1.5">NET</text>
+        <text x="236" y="32" font-size="13" font-weight="700" fill="#fff">128k</text>
+        <rect x="200" y="42" width="68" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
+        <rect x="200" y="42" width="9" height="4" rx="2" fill="#34C759"/>
+      </g>
+    </g>
+
+    <!-- Layer 2 (middle): Screen Time hero -->
+    <g transform="translate(100, 80)">
+      <g filter="url(#deep-shadow)">
+        <rect width="340" height="380" rx="22" fill="url(#card-bg)"/>
+        <rect x="0.5" y="0.5" width="339" height="379" rx="21.5" fill="none" stroke="url(#card-stroke)" stroke-width="1"/>
       </g>
 
-      <text x="20" y="148" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#FF3B30">Browsing</text>
-      <text x="20" y="166" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#fff">1h 28m</text>
+      <g transform="translate(28, 32)" font-family="Inter, sans-serif">
+        <text font-size="10" font-weight="700" fill="#fff" fill-opacity="0.5" letter-spacing="2">SCREEN TIME · TODAY</text>
 
-      <text x="92" y="148" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#5AC8FA">Social</text>
-      <text x="92" y="166" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#fff">1h 15m</text>
+        <g>
+          <text y="56" font-size="44" font-weight="500" fill="#fff" letter-spacing="-1.5">3h 1m</text>
+          <g transform="translate(132, 50)">
+            <rect x="0" y="-16" width="60" height="22" rx="11" fill="#34C759" fill-opacity="0.14"/>
+            <text x="30" y="0" text-anchor="middle" font-size="12" font-weight="700" fill="#34C759">↓ 24m</text>
+          </g>
+        </g>
 
-      <text x="160" y="148" font-family="Inter, sans-serif" font-size="10" font-weight="600" fill="#FF9F0A">Creative</text>
-      <text x="160" y="166" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#fff">9m</text>
+        <g transform="translate(0, 92)">
+          <line x1="0" y1="80" x2="284" y2="80" stroke="#fff" stroke-opacity="0.07"/>
+          <line x1="0" y1="40" x2="284" y2="40" stroke="#fff" stroke-opacity="0.04" stroke-dasharray="2 4"/>
+
+          <g>
+            <rect x="0"     y="76" width="7" height="4"  rx="1" fill="#5AC8FA" fill-opacity="0.7"/>
+            <rect x="11.5"  y="78" width="7" height="2"  rx="1" fill="#5AC8FA" fill-opacity="0.5"/>
+            <rect x="23"    y="80" width="7" height="0"  rx="1" fill="#5AC8FA"/>
+            <rect x="34.5"  y="80" width="7" height="0"  rx="1" fill="#5AC8FA"/>
+            <rect x="46"    y="80" width="7" height="0"  rx="1" fill="#5AC8FA"/>
+            <rect x="57.5"  y="80" width="7" height="0"  rx="1" fill="#5AC8FA"/>
+            <rect x="69"    y="78" width="7" height="2"  rx="1" fill="#5AC8FA" fill-opacity="0.5"/>
+            <rect x="80.5"  y="68" width="7" height="12" rx="1" fill="#5AC8FA"/>
+            <rect x="92"    y="52" width="7" height="28" rx="1" fill="#34C759"/>
+            <rect x="103.5" y="32" width="7" height="48" rx="1" fill="#34C759"/>
+            <rect x="115"   y="28" width="7" height="52" rx="1" fill="#34C759"/>
+            <rect x="126.5" y="42" width="7" height="38" rx="1" fill="#34C759"/>
+            <rect x="138"   y="58" width="7" height="22" rx="1" fill="#FF9F0A"/>
+            <rect x="149.5" y="38" width="7" height="42" rx="1" fill="#34C759"/>
+            <rect x="161"   y="22" width="7" height="58" rx="1" fill="#34C759"/>
+            <rect x="172.5" y="36" width="7" height="44" rx="1" fill="#34C759"/>
+            <rect x="184"   y="48" width="7" height="32" rx="1" fill="#34C759"/>
+            <rect x="195.5" y="54" width="7" height="26" rx="1" fill="#5AC8FA"/>
+            <rect x="207"   y="62" width="7" height="18" rx="1" fill="#5AC8FA"/>
+            <rect x="218.5" y="50" width="7" height="30" rx="1" fill="#5AC8FA"/>
+            <rect x="230"   y="44" width="7" height="36" rx="1" fill="#FF9F0A"/>
+            <rect x="241.5" y="52" width="7" height="28" rx="1" fill="#FF9F0A"/>
+            <rect x="253"   y="68" width="7" height="12" rx="1" fill="#5AC8FA" fill-opacity="0.7"/>
+            <rect x="264.5" y="74" width="7" height="6"  rx="1" fill="#5AC8FA" fill-opacity="0.5"/>
+          </g>
+
+          <g transform="translate(0, 96)" font-size="9" fill="#fff" fill-opacity="0.35" font-weight="500">
+            <text x="0">0</text>
+            <text x="69">6</text>
+            <text x="138">12</text>
+            <text x="207">18</text>
+            <text x="270">24</text>
+          </g>
+        </g>
+
+        <g transform="translate(0, 232)">
+          <line x1="0" y1="0" x2="284" y2="0" stroke="#fff" stroke-opacity="0.06"/>
+        </g>
+
+        <g transform="translate(0, 256)" font-family="Inter, sans-serif">
+          <g>
+            <rect x="0" y="0" width="3" height="36" rx="1.5" fill="#5AC8FA"/>
+            <text x="14" y="14" font-size="10" font-weight="600" fill="#fff" fill-opacity="0.55">Social</text>
+            <text x="14" y="32" font-size="16" font-weight="700" fill="#fff">1h 28m</text>
+          </g>
+          <g transform="translate(98, 0)">
+            <rect x="0" y="0" width="3" height="36" rx="1.5" fill="#34C759"/>
+            <text x="14" y="14" font-size="10" font-weight="600" fill="#fff" fill-opacity="0.55">Work</text>
+            <text x="14" y="32" font-size="16" font-weight="700" fill="#fff">51m</text>
+          </g>
+          <g transform="translate(196, 0)">
+            <rect x="0" y="0" width="3" height="36" rx="1.5" fill="#FF9F0A"/>
+            <text x="14" y="14" font-size="10" font-weight="600" fill="#fff" fill-opacity="0.55">Creative</text>
+            <text x="14" y="32" font-size="16" font-weight="700" fill="#fff">42m</text>
+          </g>
+        </g>
+      </g>
     </g>
 
-    <!-- System Pulse pill -->
-    <g transform="translate(260, 0)" filter="url(#card-shadow)">
-      <rect width="240" height="60" rx="30" fill="#1c1c1e"/>
-      <text x="22" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#fff" fill-opacity="0.55">CPU</text>
-      <text x="56" y="26" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff">23%</text>
-      <rect x="22" y="36" width="50" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
-      <rect x="22" y="36" width="12" height="4" rx="2" fill="#34C759"/>
+    <!-- Layer 3 (front): Bar Clock -->
+    <g transform="translate(290, 360)">
+      <g filter="url(#deep-shadow)">
+        <rect width="240" height="160" rx="20" fill="url(#card-bg)"/>
+        <rect x="0.5" y="0.5" width="239" height="159" rx="19.5" fill="none" stroke="url(#card-stroke)" stroke-width="1"/>
+      </g>
 
-      <text x="92" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#fff" fill-opacity="0.55">RAM</text>
-      <text x="124" y="26" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff">61%</text>
-      <rect x="92" y="36" width="50" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
-      <rect x="92" y="36" width="30" height="4" rx="2" fill="#FF9F0A"/>
+      <g transform="translate(20, 24)" font-family="Inter, sans-serif">
+        <text font-size="10" font-weight="700" fill="#fff" fill-opacity="0.5" letter-spacing="2">BAR CLOCK</text>
+        <text x="100" y="14" text-anchor="middle" font-size="34" font-weight="500" fill="#fff" letter-spacing="-1.5">14:23</text>
 
-      <text x="162" y="26" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#fff" fill-opacity="0.55">NET</text>
-      <text x="194" y="26" font-family="Inter, sans-serif" font-size="11" font-weight="700" fill="#fff">128k</text>
-      <rect x="162" y="36" width="50" height="4" rx="2" fill="#fff" fill-opacity="0.1"/>
-      <rect x="162" y="36" width="6" height="4" rx="2" fill="#34C759"/>
+        <g transform="translate(0, 64)">
+          <text font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5">H</text>
+          <rect x="14" y="-4" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
+          <rect x="14" y="-4" width="93" height="6" rx="3" fill="#FF9F0A"/>
+          <text x="186" y="2" font-size="10" font-weight="700" fill="#fff">14</text>
+        </g>
+        <g transform="translate(0, 86)">
+          <text font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5">M</text>
+          <rect x="14" y="-4" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
+          <rect x="14" y="-4" width="61" height="6" rx="3" fill="#5AC8FA"/>
+          <text x="186" y="2" font-size="10" font-weight="700" fill="#fff">23</text>
+        </g>
+        <g transform="translate(0, 108)">
+          <text font-size="9" font-weight="700" fill="#fff" fill-opacity="0.5">S</text>
+          <rect x="14" y="-4" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
+          <rect x="14" y="-4" width="120" height="6" rx="3" fill="#34C759"/>
+          <text x="186" y="2" font-size="10" font-weight="700" fill="#fff">45</text>
+        </g>
+      </g>
     </g>
 
-    <!-- Public IP pill -->
-    <g transform="translate(260, 80)" filter="url(#card-shadow)">
-      <rect width="240" height="60" rx="30" fill="#1c1c1e"/>
-      <circle cx="22" cy="30" r="5" fill="#34C759"/>
-      <text x="36" y="33" font-family="Inter, sans-serif" font-size="10" font-weight="500" fill="#fff" fill-opacity="0.7">VPN</text>
-      <line x1="74" y1="14" x2="74" y2="46" stroke="#fff" stroke-opacity="0.1"/>
-      <text x="86" y="26" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#fff">49.37.216.80</text>
-      <text x="86" y="42" font-family="Inter, sans-serif" font-size="10" fill="#fff" fill-opacity="0.55">🇮🇳  Chennai, IN</text>
-    </g>
-
-    <!-- Bar Clock -->
-    <g transform="translate(0, 220)" filter="url(#card-shadow)">
-      <rect width="240" height="140" rx="18" fill="#1c1c1e"/>
-      <text x="120" y="36" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" font-weight="700" fill="#fff">14:23</text>
-
-      <text x="20" y="70" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#fff" fill-opacity="0.55">H</text>
-      <rect x="36" y="64" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
-      <rect x="36" y="64" width="93" height="6" rx="3" fill="#FF9F0A"/>
-      <text x="206" y="70" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff">14</text>
-
-      <text x="20" y="92" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#fff" fill-opacity="0.55">M</text>
-      <rect x="36" y="86" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
-      <rect x="36" y="86" width="61" height="6" rx="3" fill="#5AC8FA"/>
-      <text x="206" y="92" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff">23</text>
-
-      <text x="20" y="114" font-family="Inter, sans-serif" font-size="9" font-weight="600" fill="#fff" fill-opacity="0.55">S</text>
-      <rect x="36" y="108" width="160" height="6" rx="3" fill="#fff" fill-opacity="0.08"/>
-      <rect x="36" y="108" width="120" height="6" rx="3" fill="#34C759"/>
-      <text x="206" y="114" font-family="Inter, sans-serif" font-size="10" font-weight="700" fill="#fff">45</text>
-    </g>
-
-    <!-- Sticky Note card -->
-    <g transform="translate(260, 160)" filter="url(#card-shadow)">
-      <rect width="240" height="200" rx="18" fill="#1c1c1e"/>
-      <text x="20" y="36" font-family="Inter, sans-serif" font-size="11" font-weight="600" fill="#fff" fill-opacity="0.55">NOTE</text>
-      <text x="20" y="68" font-family="Inter, sans-serif" font-size="13" fill="#fff">Pick up bread.</text>
-      <text x="20" y="92" font-family="Inter, sans-serif" font-size="13" fill="#fff">Reply to Maya about</text>
-      <text x="20" y="110" font-family="Inter, sans-serif" font-size="13" fill="#fff">the deck — by Tue.</text>
-      <text x="20" y="146" font-family="Inter, sans-serif" font-size="13" fill="#fff" fill-opacity="0.5">Idea: rename screens</text>
-      <text x="20" y="164" font-family="Inter, sans-serif" font-size="13" fill="#fff" fill-opacity="0.5">to "modes" everywhere?</text>
-    </g>
-  </g>
-
-  <!-- ─── Footer dots ─── -->
-  <g transform="translate(72, 540)">
-    <text font-family="Inter, sans-serif" font-size="13" fill="#fff" fill-opacity="0.4">github.com/sha5/lessplasma</text>
-  </g>
-  <g transform="translate(72, 568)" font-family="Inter, sans-serif" font-size="11" fill="#fff" fill-opacity="0.3">
-    <text>screen time · sticky note · system pulse · disk usage · calendar strip · wifi qr · public ip · bar clock</text>
   </g>
 </svg>

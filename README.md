@@ -1,114 +1,114 @@
-# lessplasma
-
-<img width="1920" alt="lessplasma desktop banner" src="screenshots/banner.png" />
+<img src="screenshots/hero.svg" alt="lessplasma" width="100%">
 
 <p align="center">
-    <i>v0.1</i><br>
-    Minimal widgets for KDE Plasma 6. Eight widgets, one aesthetic, zero bloat.<br><br>
-    <a href="https://github.com/Sha547/lessplasma/releases/latest">
-        <img src="https://img.shields.io/github/v/release/Sha547/lessplasma?style=for-the-badge" alt="Latest release">
-    </a>
+    <a href="https://github.com/Sha547/lessplasma/releases/latest"><img src="https://img.shields.io/github/v/release/Sha547/lessplasma?style=for-the-badge" alt="Latest release"></a>
     <img src="https://img.shields.io/badge/KDE_Plasma-6.0+-blue?style=for-the-badge&logo=kde" alt="KDE Plasma 6">
     <img src="https://img.shields.io/badge/license-GPL--3.0-green?style=for-the-badge" alt="License">
 </p>
 
----
-
-## Available Widgets
-
-| Widget | Package | Description | Preview |
-|---|---|---|---|
-| **Screen Time** | `screen-time` | Per-app usage with hourly stacked-bar chart, category breakdown, and top apps grid. Backed by a Python DBus daemon + KWin script. | <img src="screenshots/widgets/screen-time.png" width="320"> |
-| **Sticky Note** | `sticky-note` | Single editable note. Autosaves to plasmoid config 600 ms after you stop typing. | <img src="screenshots/widgets/sticky-note.png" width="180"> |
-| **System Pulse** | `system-pulse` | CPU / RAM / Net live bars in a pill. Reads `/proc` every 2s. Color shifts green → orange → red as load climbs. | <img src="screenshots/widgets/system-pulse.png" width="240"> |
-| **Disk Usage** | `disk-usage` | Per-drive used/free bars from `df`. Green <70%, orange 70–85%, red >85%. | <img src="screenshots/widgets/disk-usage.png" width="240"> |
-| **Calendar Strip** | `calendar-strip` | 7-day strip with event dots. Resize taller for full month grid with today highlighted as a blue circle. | <img src="screenshots/widgets/calendar-strip.png" width="220"> |
-| **WiFi QR** | `wifi-qr` | Scannable QR for current WiFi. Local generation via `qrencode` — password never leaves the machine. | <img src="screenshots/widgets/wifi-qr.png" width="180"> |
-| **Public IP** | `public-ip` | External IP, country flag, city, and VPN status (detects `tun*`/`wg*`/`tap*` interfaces). | <img src="screenshots/widgets/public-ip.png" width="240"> |
-| **Bar Clock** | `bar-clock` | Time as three filling bars: hours / minutes / seconds. Time text on top. | <img src="screenshots/widgets/bar-clock.png" width="240"> |
+Eight widgets I built for my own desktop. Dark, dot-friendly, no theme to install. If you like one, take it; the rest are independent.
 
 ---
 
-## Installation
+```
+$ cat lessplasma.manifest
 
-### Method 1: Install Script (Recommended)
+# eight widgets, all dark, all responsive
 
-**Prerequisites:**
-- KDE Plasma 6.0 or higher
-- `kpackagetool6`, `qdbus6`, `python3` with `dbus` and `gi`, `curl`
-- `qrencode` (optional, only for WiFi QR widget)
+screen-time      →  per-app usage by the hour
+sticky-note      →  editable note, autosaves
+system-pulse     →  CPU / RAM / Net live bars
+disk-usage       →  used/free per drive
+calendar-strip   →  7-day strip or full month grid
+wifi-qr          →  scannable QR for current network
+public-ip        →  external IP, country, VPN status
+bar-clock        →  time as three filling bars
 
-| Distro | Install command |
+# each widget is its own folder under packages/
+# install:  ./install.sh
+# reload:   kquitapp6 plasmashell && kstart plasmashell
+```
+
+---
+
+## Screen Time `packages/screen-time`
+
+<img src="screenshots/screen-time.png" alt="Screen Time" width="100%">
+
+This is the only widget here that's more than a single QML file. There's a Python daemon running as a systemd user service, plus a small KWin script that fires on every window-focus change and tells the daemon what window you switched to. The daemon keeps a running tally of seconds per app per hour in SQLite, ignores time when you're idle (it asks `org.freedesktop.ScreenSaver` how long it's been), and the widget polls it every 15 seconds.
+
+If a category in the chart says "Other" and you don't recognize what's in it, edit `~/.local/share/plasma-screentime/categories.json` and the widget will pick the change up automatically.
+
+## Sticky Note `packages/sticky-note`
+
+<img src="screenshots/sticky-note.png" alt="Sticky Note" width="100%">
+
+A `TextArea` that saves to plasmoid config 600ms after you stop typing. That's the whole widget.
+
+## System Pulse `packages/system-pulse`
+
+<img src="screenshots/system-pulse.png" alt="System Pulse" width="100%">
+
+Reads `/proc/stat`, `/proc/meminfo`, `/proc/net/dev` every two seconds. CPU and network are deltas between two reads, RAM is `MemTotal - MemAvailable`. Bars go green, then orange, then red as load climbs.
+
+## Disk Usage `packages/disk-usage`
+
+<img src="screenshots/disk-usage.png" alt="Disk Usage" width="100%">
+
+One row per mounted drive, colored by fullness. The hard part was getting `df` to ignore the dozens of fake filesystems Linux mounts (tmpfs, snap, fuse, overlays) and only show real disks.
+
+## Calendar Strip `packages/calendar-strip`
+
+<img src="screenshots/calendar-strip.png" alt="Calendar Strip" width="100%">
+
+Seven days with a dot for each upcoming event. Drag the corner to make it taller and it switches to a full month grid, with today highlighted as a blue circle. Events come from `DTSTART` lines in your local `.ics` files (Akonadi resources, KOrganizer, anything in `~/.local/share/calendars`). Online-only calendars won't show up; that's a different data source.
+
+## WiFi QR `packages/wifi-qr`
+
+<img src="screenshots/wifi-qr.png" alt="WiFi QR" width="100%">
+
+SSID is auto-detected. Click the ✎ to type your password once; it lives in plasmoid config locally. `qrencode` renders the standard `WIFI:T:WPA;S:<ssid>;P:<pass>;;` payload to a PNG and any phone camera reads it.
+
+## Public IP `packages/public-ip`
+
+<img src="screenshots/public-ip.png" alt="Public IP" width="100%">
+
+Pulls IP, city, country from `ipinfo.io` once a minute. The VPN dot is just `ip link show` greppped for `tun*`, `wg*`, `tap*`, `nordlynx`. It's not foolproof — a VPN running through a `eth*` interface won't trigger it — but covers most setups.
+
+## Bar Clock `packages/bar-clock`
+
+<img src="screenshots/bar-clock.png" alt="Bar Clock" width="100%">
+
+Hours, minutes, seconds as three filling bars. The seconds bar is the only one you'll catch moving.
+
+---
+
+## Install
+
+You'll need:
+
+| Distro | Command |
 |---|---|
-| Debian / Ubuntu / Neon | `sudo apt install qt6-tools python3-dbus python3-gi curl qrencode` |
-| Arch | `sudo pacman -S qt6-tools python-dbus python-gobject curl qrencode` |
-| Fedora | `sudo dnf install qt6-qttools python3-dbus python3-gobject curl qrencode` |
+| Debian / Ubuntu / Neon | `sudo apt install qt6-tools python3-dbus python3-gi curl` |
+| Arch | `sudo pacman -S qt6-tools python-dbus python-gobject curl` |
+| Fedora | `sudo dnf install qt6-qttools python3-dbus python3-gobject curl` |
 
-Clone the repository and run the install script:
+Plus `qrencode` if you want WiFi QR.
 
 ```bash
 git clone https://github.com/Sha547/lessplasma.git
 cd lessplasma
 ./install.sh
-```
-
-Then reload Plasma:
-
-```bash
 kquitapp6 plasmashell && kstart plasmashell
 ```
 
-The script installs all eight widgets, sets up the Screen Time daemon as a systemd user service, and registers the KWin tracker script. It checks dependencies upfront and prints distro-specific install hints for anything missing.
+The installer checks deps upfront, registers each plasmoid via `kpackagetool6`, and sets up the Screen Time daemon. Once that's done, right-click desktop → **Add Widgets** → search the widget name.
 
-### Method 2: Install a Single Widget Manually
+## Configure
 
-```bash
-kpackagetool6 -t Plasma/Applet -i packages/<package-name>
-```
-
-For example:
-
-```bash
-kpackagetool6 -t Plasma/Applet -i packages/sticky-note
-```
-
-The Screen Time widget needs extra setup beyond the plasmoid:
-
-```bash
-# Install the daemon binary
-install -m 0755 packages/screen-time/daemon/screentime-daemon.py ~/.local/bin/screentime-daemon
-# Install systemd user unit
-install -m 0644 packages/screen-time/daemon/screentime-daemon.service ~/.config/systemd/user/
-systemctl --user daemon-reload
-systemctl --user enable --now screentime-daemon
-
-# Install the KWin script that feeds it events
-kpackagetool6 -t KWin/Script -i kwin-script
-kwriteconfig6 --file kwinrc --group Plugins --key screentime-trackerEnabled true
-qdbus6 org.kde.KWin /KWin reconfigure
-```
-
-### Method 3: Add From the Widget Picker
-
-Once installed via Method 1 or 2:
-
-1. Right-click your desktop → **Enter Edit Mode**
-2. Click **Add Widgets**
-3. Search for any of: `Screen Time`, `Sticky Note`, `System Pulse`, `Disk Usage`, `Calendar Strip`, `WiFi QR`, `Public IP`, `Bar Clock`
-4. Drag onto the desktop
-5. Hover the widget to bring up its sidebar handles, then drag a corner to resize
-
----
-
-## Configuration
-
-Right-click any widget → **Configure** for per-widget settings.
-
-- **Screen Time** — categorisation rules live at `~/.local/share/plasma-screentime/categories.json`. Edit to add your own apps (lowercase substring match by app class).
-- **WiFi QR** — click the **✎** icon in the widget header to enter your WiFi password. Stored locally in plasmoid config only — never transmitted.
-- **Sticky Note** — just type. Autosaves automatically.
-
----
+- **Screen Time** — categories live at `~/.local/share/plasma-screentime/categories.json`. Edit to add your apps (substring match).
+- **WiFi QR** — click ✎ in the widget to set your password.
+- **Sticky Note** — just type.
 
 ## Uninstall
 
@@ -116,44 +116,12 @@ Right-click any widget → **Configure** for per-widget settings.
 ./uninstall.sh
 ```
 
-This removes all plasmoids, stops and removes the Screen Time daemon, and removes the KWin tracker script.
-
-User data is **kept** at:
-- `~/.local/share/plasma-screentime/` — Screen Time SQLite database and categories
-- `~/.cache/plasma-wifi-qr/` — generated QR PNG cache
-- Plasmoid config (sticky note text, WiFi credentials) — in `~/.config/plasma-org.kde.plasma.desktop-appletsrc`
-
-Delete manually if you want them gone.
-
----
-
-## Repo layout
-
-```
-lessplasma/
-├── install.sh          dep-checked installer
-├── uninstall.sh        clean teardown
-├── kwin-script/        feeds active-window events to Screen Time daemon
-├── packages/
-│   ├── screen-time/    plasmoid + Python daemon + systemd unit
-│   ├── sticky-note/
-│   ├── system-pulse/
-│   ├── disk-usage/
-│   ├── calendar-strip/
-│   ├── wifi-qr/
-│   ├── public-ip/
-│   └── bar-clock/
-└── screenshots/        banner + per-widget previews
-```
-
-Each widget is a standard Plasma 6 plasmoid (`metadata.json` + QML). Independent — fork a single widget without touching the rest.
-
----
+Plasmoids and daemon go. Your usage data at `~/.local/share/plasma-screentime/` stays unless you delete it.
 
 ## Credits
 
-Inspired by [nothingkdewidgets](https://github.com/jaxparrow07/nothing-kde-widgets) — different widgets, same restraint.
+Massive thanks to my friend **Jack Faith ([@jaxparrow07](https://github.com/jaxparrow07))** — his [**nothingkdewidgets**](https://github.com/jaxparrow07/nothing-kde-widgets) pack is what got me into building these in the first place. The install-script structure and packaging conventions in this repo are based on his. His widgets are also genuinely beautiful, go install them.
 
 ## License
 
-[GPL-3.0-or-later](LICENSE)
+[GPL-3.0-or-later](LICENSE).
