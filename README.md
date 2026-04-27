@@ -98,11 +98,23 @@ Plus `qrencode` if you want WiFi QR.
 ```bash
 git clone https://github.com/Sha547/lessplasma.git
 cd lessplasma
-./install.sh
-kquitapp6 plasmashell && kstart plasmashell
+./install.sh                  # all widgets
+./install.sh sticky-note      # just one
 ```
 
-The installer checks deps upfront, registers each plasmoid via `kpackagetool6`, and sets up the Screen Time daemon. Once that's done, right-click desktop → **Add Widgets** → search the widget name.
+The installer checks deps upfront, registers each plasmoid via `kpackagetool6`, sets up the Screen Time daemon, and reloads `plasmashell` for you. Once that's done, right-click desktop → **Add Widgets** → search the widget name.
+
+If you'd rather install via "Install Widget From Local File" in the picker, grab a `.plasmoid` from the [Releases](https://github.com/Sha547/lessplasma/releases) page (or build them yourself with `./package.sh --all` — outputs to `packaged/`).
+
+## Develop
+
+Quick preview of one widget without touching your live desktop:
+
+```bash
+./test.reload.sh sticky-note
+```
+
+This launches `plasmoidviewer6` against the source folder, so edits to the QML show up on the next `./test.reload.sh` run.
 
 ## Configure
 

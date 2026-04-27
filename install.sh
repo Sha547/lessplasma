@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # lessplasma installer
-# Installs all widget plasmoids + Screen Time daemon (systemd user unit).
+# Installs widget plasmoids + Screen Time daemon (systemd user unit).
+#
+# Usage:
+#   ./install.sh                  Install all widgets
+#   ./install.sh --all  | -a      Install all widgets
+#   ./install.sh <widget-name>    Install a single widget (e.g. ./install.sh sticky-note)
 
 set -euo pipefail
 
@@ -39,17 +44,16 @@ if [ ${#soft_missing[@]} -gt 0 ]; then
 fi
 
 # ──────────────────────────────────────────────────────────────────────
-# Install plasmoids
+# Helpers
 # ──────────────────────────────────────────────────────────────────────
-echo "Installing widgets..."
-
-for pkg in "$PACKAGES"/*/; do
-    [ -d "$pkg" ] || continue
-    id=$(grep -oP '"Id"\s*:\s*"\K[^"]+' "$pkg/metadata.json" | head -1)
-    name=$(basename "$pkg")
+install_widget() {
+    local pkg="$1"
+    [ -d "$pkg" ] || return 1
+    local id=$(grep -oP '"Id"\s*:\s*"\K[^"]+' "$pkg/metadata.json" | head -1)
+    local name=$(basename "$pkg")
     if [ -z "$id" ]; then
         echo "  · skip $name (no Id in metadata.json)"
-        continue
+        return 1
     fi
     if kpackagetool6 -t Plasma/Applet -l 2>/dev/null | grep -q "^$id$"; then
         kpackagetool6 -t Plasma/Applet -u "$pkg" >/dev/null
@@ -58,13 +62,11 @@ for pkg in "$PACKAGES"/*/; do
         kpackagetool6 -t Plasma/Applet -i "$pkg" >/dev/null
         echo "  · installed $name"
     fi
-done
+}
 
-# ──────────────────────────────────────────────────────────────────────
-# Screen Time daemon — needs binary + systemd unit + KWin script
-# ──────────────────────────────────────────────────────────────────────
-DAEMON_SRC="$PACKAGES/screen-time/daemon"
-if [ -d "$DAEMON_SRC" ]; then
+install_screentime_extras() {
+    local DAEMON_SRC="$PACKAGES/screen-time/daemon"
+    [ -d "$DAEMON_SRC" ] || return 0
     echo "Installing Screen Time daemon..."
     mkdir -p "$HOME/.local/bin" "$HOME/.config/systemd/user"
     install -m 0755 "$DAEMON_SRC/screentime-daemon.py" "$HOME/.local/bin/screentime-daemon"
@@ -73,7 +75,7 @@ if [ -d "$DAEMON_SRC" ]; then
     systemctl --user enable --now screentime-daemon.service >/dev/null 2>&1 || true
     echo "  · daemon enabled (systemctl --user status screentime-daemon)"
 
-    KWIN_SCRIPT_SRC="$ROOT/kwin-script"
+    local KWIN_SCRIPT_SRC="$ROOT/kwin-script"
     if [ -d "$KWIN_SCRIPT_SRC" ]; then
         if kpackagetool6 -t KWin/Script -l 2>/dev/null | grep -q "^screentime-tracker$"; then
             kpackagetool6 -t KWin/Script -u "$KWIN_SCRIPT_SRC" >/dev/null
@@ -84,18 +86,60 @@ if [ -d "$DAEMON_SRC" ]; then
         qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
         echo "  · KWin tracker script enabled"
     fi
-fi
+}
 
-echo
-echo "──────────────────────────────────────────────────────────────"
-echo "  lessplasma installed."
-echo "──────────────────────────────────────────────────────────────"
-echo
-echo "Reload Plasma to register the new widgets:"
-echo "    kquitapp6 plasmashell && kstart plasmashell"
-echo
-echo "Then right-click your desktop → Add Widgets and search for any of:"
-for pkg in "$PACKAGES"/*/; do
-    name=$(grep -oP '"Name"\s*:\s*"\K[^"]+' "$pkg/metadata.json" | head -1)
-    [ -n "$name" ] && echo "    · $name"
-done
+reload_plasma() {
+    echo
+    echo "Reloading plasmashell..."
+    kquitapp6 plasmashell >/dev/null 2>&1 || true
+    sleep 1
+    kstart plasmashell >/dev/null 2>&1 &
+    disown
+    echo "[+] Done."
+}
+
+# ──────────────────────────────────────────────────────────────────────
+# Main
+# ──────────────────────────────────────────────────────────────────────
+ARG="${1:-}"
+
+if [ -z "$ARG" ] || [ "$ARG" = "--all" ] || [ "$ARG" = "-a" ]; then
+    echo "Installing all widgets..."
+    for pkg in "$PACKAGES"/*/; do
+        install_widget "$pkg" || true
+    done
+    install_screentime_extras
+
+    echo
+    echo "──────────────────────────────────────────────────────────────"
+    echo "  lessplasma installed."
+    echo "──────────────────────────────────────────────────────────────"
+    echo
+    echo "Right-click desktop → Add Widgets and search for any of:"
+    for pkg in "$PACKAGES"/*/; do
+        name=$(grep -oP '"Name"\s*:\s*"\K[^"]+' "$pkg/metadata.json" | head -1)
+        [ -n "$name" ] && echo "    · $name"
+    done
+    reload_plasma
+
+elif [ -d "$PACKAGES/$ARG" ]; then
+    install_widget "$PACKAGES/$ARG"
+    if [ "$ARG" = "screen-time" ]; then
+        install_screentime_extras
+    fi
+    reload_plasma
+
+else
+    echo "[!] Widget not found: $ARG"
+    echo
+    echo "Available widgets:"
+    for pkg in "$PACKAGES"/*/; do
+        echo "    · $(basename "$pkg")"
+    done
+    echo
+    echo "Usage:"
+    echo "  ./install.sh                  Install all widgets"
+    echo "  ./install.sh --all | -a       Install all widgets"
+    echo "  ./install.sh <widget>         Install a single widget"
+    exit 1
+fi
