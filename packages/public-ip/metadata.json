@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            { "Email": "shafsquare54@gmail.com", "Name": "sha5" }
+        ],
+        "Category": "System Information",
+        "Description": "External IP, country, and VPN status.",
+        "EnabledByDefault": true,
+        "Id": "com.sha5.widgets.publicip",
+        "License": "GPL-3.0-or-later",
+        "Name": "Public IP",
+        "Version": "0.1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

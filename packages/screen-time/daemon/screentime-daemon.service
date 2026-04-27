@@ -1,0 +1,12 @@
+[Unit]
+Description=Plasma Screen Time daemon
+After=plasma-core.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/screentime-daemon
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

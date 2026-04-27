@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            { "Email": "shafsquare54@gmail.com", "Name": "sha5" }
+        ],
+        "Category": "Date and Time",
+        "Description": "Seven-day strip with event dots.",
+        "EnabledByDefault": true,
+        "Id": "com.sha5.widgets.calendarstrip",
+        "License": "GPL-3.0-or-later",
+        "Name": "Calendar Strip",
+        "Version": "0.1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}

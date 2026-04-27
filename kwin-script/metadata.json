@@ -1,0 +1,18 @@
+{
+    "KPackageStructure": "KWin/Script",
+    "KPlugin": {
+        "Authors": [
+            {
+                "Email": "shafsquare54@gmail.com",
+                "Name": "sha5"
+            }
+        ],
+        "Description": "Tracks active window changes for plasma-screentime.",
+        "Id": "screentime-tracker",
+        "License": "GPL-3.0-or-later",
+        "Name": "Screen Time Tracker",
+        "Version": "0.1"
+    },
+    "X-Plasma-API": "javascript",
+    "X-Plasma-MainScript": "code/main.js"
+}

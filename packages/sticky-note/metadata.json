@@ -1,0 +1,16 @@
+{
+    "KPackageStructure": "Plasma/Applet",
+    "KPlugin": {
+        "Authors": [
+            { "Email": "shafsquare54@gmail.com", "Name": "sha5" }
+        ],
+        "Category": "Utilities",
+        "Description": "Minimal editable sticky note saved to disk.",
+        "EnabledByDefault": true,
+        "Id": "com.sha5.widgets.stickynote",
+        "License": "GPL-3.0-or-later",
+        "Name": "Sticky Note",
+        "Version": "0.1"
+    },
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
