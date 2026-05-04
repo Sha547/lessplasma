@@ -15,9 +15,32 @@ PACKAGES="$ROOT/packages"
 # ──────────────────────────────────────────────────────────────────────
 # Dependency check
 # ──────────────────────────────────────────────────────────────────────
+
+# Locate qdbus6. On Fedora it's at /usr/lib64/qt6/bin/ and not on PATH by default.
+QDBUS6_BIN=""
+for candidate in qdbus6 /usr/lib64/qt6/bin/qdbus6 /usr/lib/qt6/bin/qdbus6 /usr/libexec/qt6/qdbus6 qdbus-qt6; do
+    if command -v "$candidate" >/dev/null 2>&1; then
+        QDBUS6_BIN=$(command -v "$candidate")
+        break
+    fi
+    if [ -x "$candidate" ]; then
+        QDBUS6_BIN="$candidate"
+        break
+    fi
+done
+
+# If qdbus6 was found but isn't on PATH, symlink it so the widget runtime
+# can call it without users editing their shell rc.
+if [ -n "$QDBUS6_BIN" ] && ! command -v qdbus6 >/dev/null 2>&1; then
+    mkdir -p "$HOME/.local/bin"
+    ln -sf "$QDBUS6_BIN" "$HOME/.local/bin/qdbus6"
+    echo "Note: linked $QDBUS6_BIN → ~/.local/bin/qdbus6 (Fedora's Qt6 bin dir isn't on PATH)."
+    export PATH="$HOME/.local/bin:$PATH"
+fi
+
 missing=()
 command -v kpackagetool6 >/dev/null || missing+=("kpackagetool6 (KDE Plasma 6 tools)")
-command -v qdbus6        >/dev/null || missing+=("qdbus6 (qt6-tools)")
+[ -z "$QDBUS6_BIN" ]                && missing+=("qdbus6 (qt6-tools)")
 command -v python3       >/dev/null || missing+=("python3")
 python3 -c "import dbus" 2>/dev/null || missing+=("python3-dbus")
 python3 -c "import gi"   2>/dev/null || missing+=("python3-gi")
@@ -33,6 +56,11 @@ if [ ${#missing[@]} -gt 0 ]; then
     echo "Debian/Ubuntu/Neon:  sudo apt install qt6-tools python3-dbus python3-gi curl"
     echo "Arch:                sudo pacman -S qt6-tools python-dbus python-gobject curl"
     echo "Fedora:              sudo dnf install qt6-qttools python3-dbus python3-gobject curl"
+    echo
+    echo "Fedora note: if qt6-qttools is installed but qdbus6 still isn't found,"
+    echo "  it's likely at /usr/lib64/qt6/bin/qdbus6 (not on PATH by default)."
+    echo "  Either re-run this script (it'll auto-symlink) or add to PATH:"
+    echo "    echo 'export PATH=\"\$PATH:/usr/lib64/qt6/bin\"' >> ~/.bashrc"
     exit 1
 fi
 
@@ -83,7 +111,7 @@ install_screentime_extras() {
             kpackagetool6 -t KWin/Script -i "$KWIN_SCRIPT_SRC" >/dev/null
         fi
         kwriteconfig6 --file kwinrc --group Plugins --key screentime-trackerEnabled true 2>/dev/null || true
-        qdbus6 org.kde.KWin /KWin reconfigure 2>/dev/null || true
+        "$QDBUS6_BIN" org.kde.KWin /KWin reconfigure 2>/dev/null || true
         echo "  · KWin tracker script enabled"
     fi
 }
