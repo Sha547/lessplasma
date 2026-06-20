@@ -32,33 +32,49 @@ TICK_SEC = 10
 DEFAULT_CATEGORIES = {
     "Entertainment": [
         "vlc", "mpv", "netflix", "youtube", "spotify", "plex", "jellyfin",
-        "kodi", "stremio", "smplayer", "elisa", "audacious",
+        "kodi", "stremio", "smplayer", "elisa", "audacious", "youtube_music",
+        "retroarch", "duckstation"
+    ],
+    "Gaming": [
+        "steam", "steam_app", "lutris", "bottles", "prismlauncher", 
+        "hydralauncher", "heroic"
     ],
     "Social": [
         "discord", "telegram", "telegram-desktop", "slack", "signal", "whatsapp",
         "element", "thunderbird", "evolution", "kmail", "geary", "skype", "zoom",
+        "vesktop"
     ],
     "Creativity": [
         "gimp", "krita", "blender", "inkscape", "code", "code-oss", "vscode",
         "konsole", "kate", "kwrite", "qtcreator", "intellij-idea", "android-studio",
-        "obs", "kdenlive", "darktable", "rawtherapee", "audacity",
+        "obs", "kdenlive", "darktable", "rawtherapee", "audacity", "antigravity",
+        "kitty", "alacritty", "termius"
     ],
     "Productivity": [
         "libreoffice", "calligra", "okular", "evince", "logseq", "obsidian",
         "notion", "typora", "joplin", "thunderbird-calendar", "korganizer",
+        "fdm", "jdownloader", "calibre", "proton pass", "localsend",
+        "rclone"
     ],
     "Browsing": [
         "firefox", "chromium", "google-chrome", "brave", "opera", "vivaldi",
-        "tor browser", "torbrowser",
+        "tor browser", "torbrowser", "zen-bin", "librewolf", "falkon"
     ],
+    "System": [
+        "systemsettings", "kcmshell6", "plasma-systemmonitor", "spectacle",
+        "gparted", "stacer", "missioncenter", "btrfs-assistant", "krunner",
+        "dolphin", "ark", "filelight", "waydroid"
+    ]
 }
 
 CATEGORY_COLORS = {
     "Entertainment": "#FF9F0A",
+    "Gaming": "#5856D6",
     "Social": "#34C759",
     "Creativity": "#5AC8FA",
     "Productivity": "#AF52DE",
     "Browsing": "#FF3B30",
+    "System": "#007AFF",
     "Other": "#8E8E93",
 }
 
@@ -213,7 +229,11 @@ class ScreenTimeService(dbus.service.Object):
     @dbus.service.method(IFACE, in_signature="ss", out_signature="")
     def RecordEvent(self, app_class, caption):
         self._flush_current()
-        self.current_app = str(app_class) or "unknown"
+        app_name = str(app_class) or "unknown"
+        if app_name.lower() == "kwin_wayland":
+            self.current_app = None
+        else:
+            self.current_app = app_name
 
     @dbus.service.method(IFACE, in_signature="", out_signature="s")
     def GetTodayJson(self):
