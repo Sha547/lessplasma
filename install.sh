@@ -145,7 +145,8 @@ if [ -z "$ARG" ] || [ "$ARG" = "--all" ] || [ "$ARG" = "-a" ]; then
     echo
     echo "Right-click desktop → Add Widgets and search for any of:"
     for pkg in "$PACKAGES"/*/; do
-        name=$(grep -oP '"Name"\s*:\s*"\K[^"]+' "$pkg/metadata.json" | head -1)
+        # KPlugin.Name specifically; the first "Name" in the file belongs to Authors.
+        name=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["KPlugin"]["Name"])' "$pkg/metadata.json" 2>/dev/null)
         [ -n "$name" ] && echo "    · $name"
     done
     reload_plasma

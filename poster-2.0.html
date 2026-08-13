@@ -1,0 +1,412 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* the product's own accents, used sparingly and only inside the widgets */
+    --amber: #D9913F;
+    --blue:  #6FA8C4;
+    --green: #6A9E72;
+    --red:   #B85C50;
+
+    --ink:   #E9E9EC;
+    --muted: rgba(233,233,236,.50);
+    --faint: rgba(233,233,236,.30);
+    --line:  rgba(255,255,255,.085);
+  }
+
+  html, body { width: 1920px; height: 1180px; }
+  body {
+    font-family: "Inter", "Noto Sans", "Ubuntu", "DejaVu Sans", sans-serif;
+    color: var(--ink);
+    background: #0c0d10;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .poster {
+    width: 1920px; height: 1000px; position: relative; overflow: hidden;
+    background: #0c0d10;
+  }
+
+  /* A quiet room, not a light show: one soft source top-left, one faint warm
+     ember bottom-right so the glass has something to pick up. */
+  .field {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(1200px 760px at 10% -8%, rgba(150,172,205,.30), transparent 66%),
+      radial-gradient(1020px 760px at 96% 104%, rgba(196,138,92,.22), transparent 64%),
+      radial-gradient(760px 620px at 68% 30%, rgba(104,124,156,.12), transparent 70%),
+      radial-gradient(620px 520px at 38% 88%, rgba(120,110,140,.10), transparent 72%),
+      linear-gradient(168deg, #111318 0%, #0e0f13 55%, #0b0c0f 100%);
+  }
+  /* Fine hairlines. Outside a pane they stay crisp; behind one they are
+     blurred away, which is what actually makes the glass legible. A smooth
+     gradient blurs to itself and reads as a flat dark box. */
+  .field::before {
+    content: ""; position: absolute; inset: 0;
+    background: repeating-linear-gradient(114deg,
+      rgba(255,255,255,.075) 0 1px, transparent 1px 78px);
+  }
+  /* vignette keeps the eye centred */
+  .field::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(1500px 950px at 50% 46%, transparent 46%, rgba(0,0,0,.34) 100%);
+  }
+  /* fine grain, which stops a dark gradient from reading as plastic */
+  .grain {
+    position: absolute; inset: -50%; z-index: 1;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: .055;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+
+  .stage { position: relative; height: 100%; display: flex; padding: 84px 86px; gap: 74px; z-index: 2; }
+
+  /* ---------- left ---------- */
+  .pitch { width: 508px; flex: none; display: flex; flex-direction: column; }
+
+  .eyebrow {
+    font-size: 12.5px; letter-spacing: .38em; text-transform: uppercase;
+    color: var(--faint); font-weight: 600;
+  }
+
+  .wordmark {
+    margin-top: 30px;
+    font-size: 92px; font-weight: 700; letter-spacing: -.045em; line-height: .95;
+  }
+  .wordmark .less { color: rgba(233,233,236,.42); }
+  .wordmark .plasma { color: #F4F4F6; }
+
+  .versionrow { display: flex; align-items: center; gap: 18px; margin-top: 26px; }
+  .ver { font-size: 14px; letter-spacing: .3em; color: var(--muted); font-weight: 600; }
+  .rule { height: 1px; flex: 1; background: var(--line); }
+
+  .tagline {
+    margin-top: 46px; font-size: 23px; line-height: 1.62;
+    color: rgba(233,233,236,.74); font-weight: 400; letter-spacing: -.005em;
+  }
+  .tagline b { color: #F4F4F6; font-weight: 600; }
+
+  .points { margin-top: 54px; border-top: 1px solid var(--line); }
+  .point {
+    display: flex; gap: 20px; padding: 19px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px; color: rgba(233,233,236,.56); line-height: 1.5;
+  }
+  .point .n { color: var(--faint); font-size: 11.5px; font-weight: 600; letter-spacing: .1em; padding-top: 3px; width: 22px; flex: none; }
+  .point b { color: rgba(233,233,236,.92); font-weight: 600; }
+
+  .foot { margin-top: auto; display: flex; align-items: center; gap: 18px; }
+  .qr { width: 78px; height: 78px; border-radius: 8px; padding: 7px; background: rgba(233,233,236,.9); flex: none; }
+  .qr img { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+  .footmeta { font-size: 13.5px; line-height: 1.7; color: var(--faint); }
+  .footmeta .repo { color: rgba(233,233,236,.82); font-weight: 600; font-size: 15px; letter-spacing: -.005em; }
+
+  /* ---------- glass ---------- */
+  .card {
+    position: relative;
+    border-radius: 20px;
+    background: rgba(11,12,15,.34);
+    backdrop-filter: blur(30px) saturate(1.05);
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow: 0 20px 54px rgba(0,0,0,.44);
+    padding: 17px 19px;
+    overflow: hidden;
+  }
+  .card::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.09) 0%, rgba(255,255,255,.015) 36%, rgba(0,0,0,.13) 100%);
+  }
+  .pill { border-radius: 999px; padding: 15px 26px; }
+
+  .badge {
+    position: absolute; top: 14px; right: 15px; z-index: 3;
+    font-size: 9.5px; font-weight: 600; letter-spacing: .22em;
+    color: rgba(233,233,236,.62);
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(233,233,236,.28);
+  }
+
+  .lab { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); font-weight: 600; }
+
+  /* ---------- widgets ---------- */
+  .grid {
+    flex: 1; display: grid; gap: 18px;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 250px 158px 188px 158px;
+    z-index: 2;
+  }
+
+  .np { grid-column: 1; grid-row: 1 / span 2; display: flex; flex-direction: column; }
+  .np .cover {
+    width: 100%; height: 238px; border-radius: 11px; margin-bottom: 15px; flex: none;
+    position: relative; overflow: hidden;
+    background: linear-gradient(155deg, #33383F 0%, #262A31 46%, #3A322C 100%);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.07);
+  }
+  .np .cover::after {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(180px 130px at 34% 26%, rgba(255,255,255,.10), transparent 68%),
+      radial-gradient(150px 150px at 78% 84%, rgba(217,145,63,.14), transparent 70%);
+  }
+  .np .t { font-size: 15px; font-weight: 600; text-align: center; letter-spacing: -.005em; }
+  .np .a { font-size: 12px; color: var(--faint); text-align: center; margin-top: 3px; }
+  .np .bar { height: 2px; border-radius: 1px; background: rgba(255,255,255,.11); margin-top: 13px; }
+  .np .bar i { display: block; height: 100%; width: 38%; border-radius: 1px; background: var(--blue); }
+  .np .ctrls { display: flex; justify-content: center; align-items: center; gap: 22px; margin-top: 13px; }
+  .np .ctrls svg { fill: rgba(233,233,236,.66); }
+
+  .wx { grid-column: 2 / span 2; grid-row: 1; }
+  .wx .head { display: flex; align-items: center; gap: 14px; margin-top: 9px; }
+  .wx .temp { font-size: 36px; font-weight: 600; letter-spacing: -.03em; line-height: 1; }
+  .wx .cond { font-size: 13px; color: var(--muted); }
+  .wx .city { font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+  .wx .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 18px; }
+  .wx .d { text-align: center; }
+  .wx .d .dn { font-size: 10.5px; color: var(--faint); font-weight: 500; }
+  .wx .d.today .dn { color: var(--blue); }
+  .wx .d svg { margin: 7px auto 6px; display: block; }
+  .wx .d .hi { font-size: 13px; font-weight: 600; }
+  .wx .d .lo { font-size: 11px; color: var(--faint); }
+
+  .clock { grid-column: 2; grid-row: 2; display: flex; flex-direction: column; justify-content: center; }
+  .clock .time { font-size: 28px; font-weight: 600; text-align: center; letter-spacing: -.02em; }
+  .clock .rows { margin-top: 13px; display: flex; flex-direction: column; gap: 8px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .row .k { font-size: 10px; color: var(--faint); width: 10px; font-weight: 500; }
+  .row .track { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.09); overflow: hidden; }
+  .row .track i { display: block; height: 100%; border-radius: 2px; }
+  .row .v { font-size: 11px; color: var(--muted); width: 20px; text-align: right; }
+
+  .pulse { grid-column: 3; grid-row: 2; display: flex; align-items: center; }
+  .pulse .stats { display: flex; gap: 20px; width: 100%; }
+  .pulse .s { flex: 1; }
+  .pulse .s .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .pulse .s .n { font-size: 11.5px; font-weight: 600; color: rgba(233,233,236,.8); }
+  .pulse .s .track { height: 3px; border-radius: 2px; background: rgba(255,255,255,.09); margin-top: 8px; overflow: hidden; }
+  .pulse .s .track i { display: block; height: 100%; border-radius: 2px; }
+
+  .st { grid-column: 1; grid-row: 3 / span 2; }
+  .st .total { font-size: 29px; font-weight: 600; letter-spacing: -.025em; margin-top: 4px; }
+  .st .chart { display: flex; align-items: flex-end; gap: 3px; height: 132px; margin-top: 24px; }
+  .st .chart i { flex: 1; border-radius: 1px; background: rgba(111,168,196,.72); }
+  .st .legend { display: flex; gap: 15px; margin-top: 16px; }
+  .st .legend span { font-size: 11px; color: var(--faint); display: flex; align-items: center; gap: 6px; }
+  .st .legend i { width: 6px; height: 6px; border-radius: 50%; }
+
+  .cal { grid-column: 2 / span 2; grid-row: 3; }
+  .cal .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 15px; }
+  .cal .d { text-align: center; }
+  .cal .d .dn { font-size: 10.5px; color: var(--faint); font-weight: 500; }
+  .cal .d.today .dn { color: var(--blue); }
+  .cal .d .num { font-size: 19px; font-weight: 500; margin-top: 5px; color: rgba(233,233,236,.88); }
+  .cal .d.today .num {
+    background: rgba(111,168,196,.9); color: #10141a; border-radius: 50%;
+    width: 30px; height: 30px; line-height: 30px; margin: 5px auto 0; font-weight: 600;
+  }
+  .cal .dots { display: flex; justify-content: center; gap: 3px; margin-top: 8px; height: 3px; }
+  .cal .dots i { width: 3px; height: 3px; border-radius: 50%; background: rgba(217,145,63,.85); }
+
+  .disk { grid-column: 2; grid-row: 4; }
+  .disk .r { margin-top: 12px; }
+  .disk .r .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .disk .r .n { font-size: 12px; font-weight: 500; color: rgba(233,233,236,.86); }
+  .disk .r .f { font-size: 10.5px; color: var(--faint); }
+  .disk .r .track { height: 3px; border-radius: 2px; background: rgba(255,255,255,.09); margin-top: 7px; overflow: hidden; }
+  .disk .r .track i { display: block; height: 100%; border-radius: 2px; }
+
+  .ip { grid-column: 3; grid-row: 4; display: flex; align-items: center; gap: 14px; }
+  .ip .led { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex: none; }
+  .ip .who { font-size: 10.5px; color: var(--faint); font-weight: 600; letter-spacing: .12em; }
+  .ip .sep { width: 1px; align-self: stretch; margin: 5px 0; background: var(--line); }
+  .ip .addr { font-size: 15px; font-weight: 500; letter-spacing: -.005em; color: rgba(233,233,236,.92); }
+  .ip .loc { font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="poster">
+  <div class="field"></div>
+
+  <div class="grain"></div>
+
+  <div class="stage">
+    <div class="pitch">
+      <div class="eyebrow">Widgets for KDE Plasma 6</div>
+
+      <div class="wordmark"><span class="less">less</span><span class="plasma">plasma</span></div>
+
+      <div class="versionrow">
+        <span class="ver">VERSION 2.0</span>
+        <span class="rule"></span>
+      </div>
+
+      <div class="tagline">
+        Ten widgets I built for my own desktop. Every card reads the wallpaper
+        behind it and blurs it, so it looks like glass instead of a dark rectangle.
+      </div>
+
+      <div class="points">
+        <div class="point"><span class="n">01</span>
+          <span>Two new widgets: Now Playing and Weather Strip.</span></div>
+        <div class="point"><span class="n">02</span>
+          <span>Every widget has a Configure page now. Colours, blur, corner radius, refresh rates.</span></div>
+        <div class="point"><span class="n">03</span>
+          <span>No API keys, no theme to install.</span></div>
+      </div>
+
+      <div class="foot">
+        <div class="qr"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAK4AAACuAQMAAACVwqStAAAABlBMVEUAAAD///+l2Z/dAAAAAnRSTlP//8i138cAAAAJcEhZcwAACxIAAAsSAdLdfvwAAAE3SURBVEiJxZfRjcMwDEMFaACP5NU9UgYwwIqUm0NvADMI0vi5H4REWUoEr5lY+UQM8BmRYcAJ4Jk7Zv3WZr3zxYKfumetqFGYeo2Y6kDgxntI2vgn8C5W0hQq7IHfXF7Fx8jPe//4+yaGrlpt1VP22oErUUxaEJfSN1T3MSht1QFD72Bt/ivgwK2uNxUn6rVgqJ5qJyhzdczSgrEqV4pWVTaVdtLu47po3IGt4sJfpd3Gu83LrkjvnEK3YK5wIoTV9rFgDQhTB7ASOHQAO3Di+Lcz1oefBdMsSprUrbZSenDVE3YH7IkzTFkw4zRDHUBPxcyBT2Ns+8hHMWDBPSx8uzTryYXfAapHuZTYtGANlac9siGo3I1Yp92ZK+HEagUhR3Ns8WAlTV8e/c5NC24jyzi6uyEY8AcjNFCg7hvTIAAAAABJRU5ErkJggg==" alt=""></div>
+        <div class="footmeta">
+          <div class="repo">github.com/Sha547/lessplasma</div>
+          GPL-3.0 · Plasma 6.0+ · <b>./install.sh</b>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <div class="card np">
+        <div class="badge">NEW</div>
+        <div class="cover"></div>
+        <div class="t">Glass Houses</div>
+        <div class="a">The Testers</div>
+        <div class="bar"><i></i></div>
+        <div class="ctrls">
+          <svg width="13" height="13" viewBox="0 0 24 24"><path d="M6 6h2.5v12H6zm3.5 6 9-6v12z"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>
+          <svg width="13" height="13" viewBox="0 0 24 24"><path d="M15.5 6H18v12h-2.5zm-1 6-9 6V6z"/></svg>
+        </div>
+      </div>
+
+      <div class="card wx">
+        <div class="badge">NEW</div>
+        <div class="lab">Weather Strip</div>
+        <div class="head">
+          <svg width="30" height="30" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4.6" fill="#D9913F"/>
+            <g stroke="#D9913F" stroke-width="1.5" stroke-linecap="round" opacity=".85">
+              <path d="M12 2.6v2.2M12 19.2V21.4M2.6 12h2.2M19.2 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>
+            </g>
+          </svg>
+          <div class="temp">35°C</div>
+          <div>
+            <div class="cond">Overcast</div>
+            <div class="city">Chennai</div>
+          </div>
+        </div>
+        <div class="days">
+          <div class="d today"><div class="dn">Today</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#D9913F"/></svg>
+            <div class="hi">35°</div><div class="lo">27°</div></div>
+          <div class="d"><div class="dn">Thu</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 17h10a3.6 3.6 0 0 0 .3-7.2 5.2 5.2 0 0 0-9.9-1A3.8 3.8 0 0 0 7 17z" fill="rgba(233,233,236,.5)"/></svg>
+            <div class="hi">36°</div><div class="lo">27°</div></div>
+          <div class="d"><div class="dn">Fri</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 15h10a3.6 3.6 0 0 0 .3-7.2 5.2 5.2 0 0 0-9.9-1A3.8 3.8 0 0 0 7 15z" fill="rgba(233,233,236,.5)"/><g stroke="#6FA8C4" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l-.7 2.2M13 18l-.7 2.2M17 18l-.7 2.2"/></g></svg>
+            <div class="hi">34°</div><div class="lo">26°</div></div>
+          <div class="d"><div class="dn">Sat</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 15h10a3.6 3.6 0 0 0 .3-7.2 5.2 5.2 0 0 0-9.9-1A3.8 3.8 0 0 0 7 15z" fill="rgba(233,233,236,.5)"/><g stroke="#6FA8C4" stroke-width="1.5" stroke-linecap="round"><path d="M9 18l-.7 2.2M13 18l-.7 2.2M17 18l-.7 2.2"/></g></svg>
+            <div class="hi">33°</div><div class="lo">26°</div></div>
+          <div class="d"><div class="dn">Sun</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="10.5" cy="10" r="3.6" fill="#D9913F"/><path d="M8 17h9a3.2 3.2 0 0 0 .2-6.4A4.6 4.6 0 0 0 8 11.4 2.9 2.9 0 0 0 8 17z" fill="rgba(233,233,236,.5)"/></svg>
+            <div class="hi">34°</div><div class="lo">27°</div></div>
+          <div class="d"><div class="dn">Mon</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.6" fill="#D9913F"/></svg>
+            <div class="hi">36°</div><div class="lo">28°</div></div>
+          <div class="d"><div class="dn">Tue</div>
+            <svg width="20" height="20" viewBox="0 0 24 24"><path d="M7 17h10a3.6 3.6 0 0 0 .3-7.2 5.2 5.2 0 0 0-9.9-1A3.8 3.8 0 0 0 7 17z" fill="rgba(233,233,236,.5)"/></svg>
+            <div class="hi">35°</div><div class="lo">27°</div></div>
+        </div>
+      </div>
+
+      <div class="card clock">
+        <div class="time">22:59</div>
+        <div class="rows">
+          <div class="row"><span class="k">H</span><span class="track"><i style="width:92%;background:var(--amber)"></i></span><span class="v">22</span></div>
+          <div class="row"><span class="k">M</span><span class="track"><i style="width:98%;background:var(--blue)"></i></span><span class="v">59</span></div>
+          <div class="row"><span class="k">S</span><span class="track"><i style="width:45%;background:var(--green)"></i></span><span class="v">27</span></div>
+        </div>
+      </div>
+
+      <div class="card pill pulse">
+        <div class="stats">
+          <div class="s">
+            <div class="top"><span class="lab">CPU</span><span class="n">11%</span></div>
+            <div class="track"><i style="width:11%;background:var(--green)"></i></div>
+          </div>
+          <div class="s">
+            <div class="top"><span class="lab">RAM</span><span class="n">63%</span></div>
+            <div class="track"><i style="width:63%;background:var(--amber)"></i></div>
+          </div>
+          <div class="s">
+            <div class="top"><span class="lab">NET</span><span class="n">6k/s</span></div>
+            <div class="track"><i style="width:9%;background:var(--green)"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card st">
+        <div class="lab">Screen Time</div>
+        <div class="total">4h 12m</div>
+        <div class="chart">
+          <i style="height:12%"></i><i style="height:8%"></i><i style="height:5%"></i><i style="height:4%"></i>
+          <i style="height:10%;background:rgba(217,145,63,.7)"></i><i style="height:24%"></i><i style="height:39%"></i>
+          <i style="height:56%;background:rgba(217,145,63,.7)"></i><i style="height:71%"></i><i style="height:60%"></i>
+          <i style="height:86%"></i><i style="height:68%;background:rgba(106,158,114,.7)"></i><i style="height:52%"></i>
+          <i style="height:77%"></i><i style="height:94%"></i><i style="height:65%;background:rgba(217,145,63,.7)"></i>
+          <i style="height:46%"></i><i style="height:33%"></i>
+        </div>
+        <div class="legend">
+          <span><i style="background:var(--blue)"></i>Code</span>
+          <span><i style="background:var(--amber)"></i>Web</span>
+          <span><i style="background:var(--green)"></i>Media</span>
+        </div>
+      </div>
+
+      <div class="card cal">
+        <div class="lab">Calendar Strip</div>
+        <div class="days">
+          <div class="d today"><div class="dn">Wed</div><div class="num">13</div><div class="dots"><i></i><i></i></div></div>
+          <div class="d"><div class="dn">Thu</div><div class="num">14</div><div class="dots"><i></i></div></div>
+          <div class="d"><div class="dn">Fri</div><div class="num">15</div><div class="dots"></div></div>
+          <div class="d"><div class="dn">Sat</div><div class="num">16</div><div class="dots"><i></i><i></i><i></i></div></div>
+          <div class="d"><div class="dn">Sun</div><div class="num">17</div><div class="dots"></div></div>
+          <div class="d"><div class="dn">Mon</div><div class="num">18</div><div class="dots"><i></i></div></div>
+          <div class="d"><div class="dn">Tue</div><div class="num">19</div><div class="dots"><i></i><i></i></div></div>
+        </div>
+      </div>
+
+      <div class="card disk">
+        <div class="lab">Storage</div>
+        <div class="r">
+          <div class="top"><span class="n">Root</span><span class="f">17.6 GB free</span></div>
+          <div class="track"><i style="width:88%;background:var(--red)"></i></div>
+        </div>
+        <div class="r">
+          <div class="top"><span class="n">efi</span><span class="f">291 MB free</span></div>
+          <div class="track"><i style="width:12%;background:var(--green)"></i></div>
+        </div>
+      </div>
+
+      <div class="card pill ip">
+        <span class="led"></span>
+        <span class="who">VPN</span>
+        <span class="sep"></span>
+        <div>
+          <div class="addr">203.0.113.42</div>
+          <div class="loc">Chennai, India</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
