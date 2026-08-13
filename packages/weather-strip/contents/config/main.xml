@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                          http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+    <group name="General">
+        <entry name="refreshMinutes" type="Int">
+            <default>30</default>
+        </entry>
+        <entry name="latitude" type="String">
+            <default></default>
+        </entry>
+        <entry name="longitude" type="String">
+            <default></default>
+        </entry>
+        <entry name="useFahrenheit" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="forecastDays" type="Int">
+            <default>7</default>
+        </entry>
+        <entry name="accentColorHex" type="String">
+            <default>#5AC8FA</default>
+        </entry>
+        <entry name="glassBlur" type="Double">
+            <default>1.0</default>
+        </entry>
+        <entry name="glassTintOpacity" type="Double">
+            <default>0.42</default>
+        </entry>
+        <entry name="cornerRadius" type="Int">
+            <default>22</default>
+        </entry>
+    </group>
+</kcfg>
