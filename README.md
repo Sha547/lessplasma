@@ -31,6 +31,8 @@ weather-strip    →  7-day forecast, no API key
 # reload:   kquitapp6 plasmashell && kstart plasmashell
 ```
 
+<img src="screenshots/desktop.png" alt="All ten widgets on the desktop" width="100%">
+
 ---
 
 ## Screen Time `packages/screen-time`
@@ -85,11 +87,15 @@ Hours, minutes, seconds as three filling bars. The seconds bar is the only one y
 
 ## Now Playing `packages/now-playing`
 
+<img src="screenshots/now-playing.png" alt="Now Playing" width="100%">
+
 Whatever's playing right now: title, artist, progress, and prev/play/next. It talks to any MPRIS player (Spotify, VLC, mpv, browsers, Elisa) over D-Bus via `qdbus6`, so there's nothing extra to install. If the player publishes cover art, the art gets blurred into the card behind the text.
 
 If several players are open it prefers whichever is actually playing, falling back to the first one it finds.
 
 ## Weather Strip `packages/weather-strip`
+
+<img src="screenshots/weather-strip.png" alt="Weather Strip" width="100%">
 
 Seven days across, each with an icon and a high/low. Drag it taller and the current conditions get their own header above the strip.
 
