@@ -22,8 +22,8 @@ PlasmoidItem {
     }
 
     function colorFor(pct) {
-        if (pct > 0.85) return "#FF3B30";
-        if (pct > 0.70) return "#FF9F0A";
+        if (pct > plasmoid.configuration.criticalThreshold) return "#FF3B30";
+        if (pct > plasmoid.configuration.warnThreshold) return "#FF9F0A";
         return "#34C759";
     }
 
@@ -52,6 +52,13 @@ PlasmoidItem {
                     if (mount.indexOf("/run/") === 0) return;
                     if (mount.indexOf("/var/snap/") === 0) return;
                     if (mount.indexOf("/snap/") === 0) return;
+                    var excludes = plasmoid.configuration.excludedMounts
+                        .split(",")
+                        .map(function(s) { return s.trim(); })
+                        .filter(function(s) { return s.length > 0; });
+                    for (var i = 0; i < excludes.length; ++i) {
+                        if (mount.indexOf(excludes[i]) !== -1) return;
+                    }
                     var name = mount === "/" ? "Root" :
                                mount.split("/").pop() || mount;
                     out.push({
@@ -80,7 +87,7 @@ PlasmoidItem {
     }
 
     Timer {
-        interval: 30 * 1000
+        interval: plasmoid.configuration.refreshSeconds * 1000
         running: true
         repeat: true
         triggeredOnStart: true
@@ -88,6 +95,7 @@ PlasmoidItem {
     }
 
     fullRepresentation: Item {
+        id: view
         Layout.preferredWidth: 320
         Layout.preferredHeight: Math.max(120, 40 + root.drives.length * 56)
         Layout.minimumWidth: 240
@@ -95,18 +103,17 @@ PlasmoidItem {
 
         readonly property bool compact: height < 160
 
-        Rectangle {
+        GlassCard {
             anchors.fill: parent
             anchors.margins: 10
-            color: "#1a1a1a"
-            radius: 22
-            opacity: 0.95
-            clip: true
+            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
+            blurAmount: plasmoid.configuration.glassBlur
+            tintOpacity: plasmoid.configuration.glassTintOpacity
 
             ColumnLayout {
                 anchors.fill: parent
                 anchors.margins: 18
-                spacing: parent.parent.compact ? 6 : 12
+                spacing: view.compact ? 6 : 12
 
                 Text {
                     text: "Storage"
@@ -119,7 +126,7 @@ PlasmoidItem {
                 ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    spacing: parent.parent.parent.compact ? 6 : 10
+                    spacing: view.compact ? 6 : 10
 
                     Repeater {
                         model: root.drives

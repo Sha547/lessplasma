@@ -5,17 +5,17 @@
                           http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
     <kcfgfile name=""/>
     <group name="General">
-        <entry name="refreshSeconds" type="Int">
-            <default>15</default>
+        <entry name="hourColorHex" type="String">
+            <default>#FF9F0A</default>
         </entry>
-        <entry name="topCount" type="Int">
-            <default>5</default>
+        <entry name="minuteColorHex" type="String">
+            <default>#5AC8FA</default>
         </entry>
-        <entry name="chartCapMinutes" type="Int">
-            <default>30</default>
+        <entry name="secondColorHex" type="String">
+            <default>#34C759</default>
         </entry>
-        <entry name="maxCategoryChips" type="Int">
-            <default>3</default>
+        <entry name="clockFontSize" type="Int">
+            <default>26</default>
         </entry>
         <entry name="glassBlur" type="Double">
             <default>1.0</default>
@@ -24,7 +24,7 @@
             <default>0.42</default>
         </entry>
         <entry name="cornerRadius" type="Int">
-            <default>28</default>
+            <default>22</default>
         </entry>
     </group>
 </kcfg>

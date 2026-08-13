@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs
 import org.kde.plasma.plasmoid
 import org.kde.plasma.core as PlasmaCore
 import org.kde.plasma.plasma5support as P5Support
@@ -22,10 +21,18 @@ PlasmoidItem {
         : ssid
     readonly property string password: plasmoid.configuration.password
     readonly property string security: plasmoid.configuration.security
+    readonly property int qrSize: plasmoid.configuration.qrSize
+    readonly property int qrMargin: plasmoid.configuration.qrMargin
+
+    // True once we have enough to build a QR that actually connects. An open
+    // network needs no password; a secured one is not encodable without it, and
+    // encoding it as "nopass" would produce a code that silently fails to join.
+    readonly property bool payloadReady: effectiveSsid.length > 0
+        && (security === "nopass" || password.length > 0)
 
     function buildPayload() {
-        if (!effectiveSsid) return "";
-        if (security === "nopass" || password.length === 0) {
+        if (!payloadReady) return "";
+        if (security === "nopass") {
             return "WIFI:T:nopass;S:" + effectiveSsid + ";;";
         }
         return "WIFI:T:" + security + ";S:" + effectiveSsid + ";P:" + password + ";;";
@@ -70,27 +77,34 @@ PlasmoidItem {
 
         function regenerate() {
             var payload = root.buildPayload();
-            if (!payload) return;
+            if (!payload) {
+                root.qrPath = "";
+                return;
+            }
             var safePayload = payload.replace(/'/g, "'\\''");
             var cmd =
                 'if ! command -v qrencode >/dev/null; then echo MISSING; exit 0; fi; ' +
                 'D="$HOME/.cache/plasma-wifi-qr"; mkdir -p "$D"; ' +
                 'F="$D/qr.png"; ' +
-                "qrencode -t PNG -s 12 -m 2 -o \"$F\" '" + safePayload + "' 2>/dev/null && echo \"$F\"";
+                "qrencode -t PNG -s " + root.qrSize + " -m " + root.qrMargin + " -o \"$F\" '" + safePayload + "' 2>/dev/null && echo \"$F\"";
             connectSource(cmd);
         }
     }
 
     Timer {
-        interval: 30000
+        interval: root.qrPollInterval
         running: true
         repeat: true
         triggeredOnStart: true
         onTriggered: ssidDS.refresh()
     }
 
+    readonly property int qrPollInterval: plasmoid.configuration.ssidPollIntervalMs
+
     onPasswordChanged: qrDS.regenerate()
     onSecurityChanged: qrDS.regenerate()
+    onQrSizeChanged: qrDS.regenerate()
+    onQrMarginChanged: qrDS.regenerate()
     Connections {
         target: plasmoid.configuration
         function onSsidOverrideChanged() { qrDS.regenerate(); }
@@ -102,13 +116,12 @@ PlasmoidItem {
         Layout.minimumWidth: 180
         Layout.minimumHeight: 200
 
-        Rectangle {
+        GlassCard {
             anchors.fill: parent
             anchors.margins: 10
-            color: "#1a1a1a"
-            radius: 22
-            opacity: 0.95
-            clip: true
+            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
+            blurAmount: plasmoid.configuration.glassBlur
+            tintOpacity: plasmoid.configuration.glassTintOpacity
 
             ColumnLayout {
                 anchors.fill: parent
@@ -124,17 +137,6 @@ PlasmoidItem {
                         font.weight: Font.Medium
                         elide: Text.ElideRight
                         Layout.fillWidth: true
-                    }
-                    Text {
-                        text: "✎"
-                        color: Qt.rgba(1, 1, 1, 0.55)
-                        font.pixelSize: 14
-                        MouseArea {
-                            anchors.fill: parent
-                            anchors.margins: -8
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: passwordDialog.open()
-                        }
                     }
                 }
 
@@ -173,67 +175,25 @@ PlasmoidItem {
 
                     Text {
                         anchors.centerIn: parent
-                        visible: !root.qrencodeMissing && root.password.length === 0 && root.security !== "nopass"
-                        text: "Tap ✎ to set password"
+                        width: parent.width - 16
+                        visible: !root.qrencodeMissing && !root.payloadReady
+                        text: root.effectiveSsid.length === 0
+                              ? "No Wi-Fi network detected"
+                              : "Right-click → Configure\nto set the password"
                         color: Qt.rgba(1, 1, 1, 0.5)
                         font.pixelSize: 12
+                        wrapMode: Text.WordWrap
+                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
 
                 Text {
-                    text: root.password.length > 0 || root.security === "nopass"
-                          ? "Scan to connect"
-                          : ""
+                    text: root.payloadReady ? "Scan to connect" : ""
                     color: Qt.rgba(1, 1, 1, 0.45)
                     font.pixelSize: 11
                     Layout.alignment: Qt.AlignHCenter
                     visible: text.length > 0
                 }
-            }
-        }
-
-        Dialog {
-            id: passwordDialog
-            title: "WiFi credentials"
-            standardButtons: Dialog.Ok | Dialog.Cancel
-            modal: true
-            anchors.centerIn: parent
-            width: 320
-
-            ColumnLayout {
-                anchors.fill: parent
-                spacing: 8
-
-                Label { text: "SSID (leave empty to auto-detect)" }
-                TextField {
-                    id: ssidField
-                    Layout.fillWidth: true
-                    text: plasmoid.configuration.ssidOverride
-                    placeholderText: root.ssid
-                }
-
-                Label { text: "Security" }
-                ComboBox {
-                    id: secField
-                    Layout.fillWidth: true
-                    model: ["WPA", "WEP", "nopass"]
-                    currentIndex: model.indexOf(plasmoid.configuration.security)
-                }
-
-                Label { text: "Password" }
-                TextField {
-                    id: pwField
-                    Layout.fillWidth: true
-                    text: plasmoid.configuration.password
-                    echoMode: TextInput.Password
-                }
-            }
-
-            onAccepted: {
-                plasmoid.configuration.ssidOverride = ssidField.text;
-                plasmoid.configuration.security = secField.currentText;
-                plasmoid.configuration.password = pwField.text;
-                qrDS.regenerate();
             }
         }
     }

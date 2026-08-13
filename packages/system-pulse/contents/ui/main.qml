@@ -94,7 +94,7 @@ PlasmoidItem {
     }
 
     Timer {
-        interval: 2000
+        interval: plasmoid.configuration.pollIntervalMs
         running: true
         repeat: true
         triggeredOnStart: true
@@ -107,12 +107,12 @@ PlasmoidItem {
         Layout.minimumWidth: 180
         Layout.minimumHeight: 64
 
-        Rectangle {
+        GlassCard {
             anchors.fill: parent
             anchors.margins: 10
-            color: "#1a1a1a"
-            radius: height / 2
-            opacity: 0.95
+            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
+            blurAmount: plasmoid.configuration.glassBlur
+            tintOpacity: plasmoid.configuration.glassTintOpacity
 
             RowLayout {
                 anchors.fill: parent
@@ -122,21 +122,37 @@ PlasmoidItem {
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    StatBar { label: "CPU"; value: root.cpu; suffix: "%"; displayValue: Math.round(root.cpu * 100) }
+                    StatBar {
+                        label: "CPU"
+                        value: root.cpu
+                        suffix: "%"
+                        displayValue: Math.round(root.cpu * 100)
+                        warnThreshold: plasmoid.configuration.warnThreshold
+                        criticalThreshold: plasmoid.configuration.criticalThreshold
+                    }
                 }
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    StatBar { label: "RAM"; value: root.ram; suffix: "%"; displayValue: Math.round(root.ram * 100) }
+                    StatBar {
+                        label: "RAM"
+                        value: root.ram
+                        suffix: "%"
+                        displayValue: Math.round(root.ram * 100)
+                        warnThreshold: plasmoid.configuration.warnThreshold
+                        criticalThreshold: plasmoid.configuration.criticalThreshold
+                    }
                 }
                 Item {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     StatBar {
                         label: "NET"
-                        value: Math.min(1, root.netKbps / 5000)
+                        value: Math.min(1, root.netKbps / plasmoid.configuration.netCeilingKBps)
                         suffix: "k/s"
                         displayValue: Math.round(root.netKbps)
+                        warnThreshold: plasmoid.configuration.warnThreshold
+                        criticalThreshold: plasmoid.configuration.criticalThreshold
                     }
                 }
             }

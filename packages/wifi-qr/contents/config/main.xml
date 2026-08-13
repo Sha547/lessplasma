@@ -12,5 +12,23 @@
         <entry name="ssidOverride" type="String">
             <default></default>
         </entry>
+        <entry name="ssidPollIntervalMs" type="Int">
+            <default>30000</default>
+        </entry>
+        <entry name="qrSize" type="Int">
+            <default>12</default>
+        </entry>
+        <entry name="qrMargin" type="Int">
+            <default>2</default>
+        </entry>
+        <entry name="glassBlur" type="Double">
+            <default>1.0</default>
+        </entry>
+        <entry name="glassTintOpacity" type="Double">
+            <default>0.42</default>
+        </entry>
+        <entry name="cornerRadius" type="Int">
+            <default>22</default>
+        </entry>
     </group>
 </kcfg>

@@ -68,7 +68,7 @@ PlasmoidItem {
     }
 
     Timer {
-        interval: 5 * 60 * 1000
+        interval: plasmoid.configuration.refreshMinutes * 60 * 1000
         running: true
         repeat: true
         triggeredOnStart: true
@@ -76,6 +76,7 @@ PlasmoidItem {
     }
 
     fullRepresentation: Item {
+        id: view
         Layout.preferredWidth: 360
         Layout.preferredHeight: 100
         Layout.minimumWidth: 260
@@ -83,18 +84,17 @@ PlasmoidItem {
 
         readonly property bool monthMode: height >= 220
 
-        Rectangle {
+        GlassCard {
             anchors.fill: parent
             anchors.margins: 10
-            color: "#1a1a1a"
-            radius: 22
-            opacity: 0.95
-            clip: true
+            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
+            blurAmount: plasmoid.configuration.glassBlur
+            tintOpacity: plasmoid.configuration.glassTintOpacity
 
             Loader {
                 anchors.fill: parent
                 anchors.margins: 16
-                sourceComponent: parent.parent.monthMode ? monthView : stripView
+                sourceComponent: view.monthMode ? monthView : stripView
             }
         }
 
@@ -112,7 +112,7 @@ PlasmoidItem {
 
                         Text {
                             text: root.dayLabel(parent.index)
-                            color: parent.index === 0 ? "#5AC8FA" : Qt.rgba(1,1,1,0.55)
+                            color: parent.index === 0 ? plasmoid.configuration.todayColorHex : Qt.rgba(1,1,1,0.55)
                             font.pixelSize: 10
                             font.weight: Font.Medium
                             Layout.alignment: Qt.AlignHCenter
@@ -131,11 +131,11 @@ PlasmoidItem {
                                 model: {
                                     var d = new Date();
                                     d.setDate(d.getDate() + parent.parent.index);
-                                    return Math.min(3, root.eventDates[root.dateKey(d)] || 0);
+                                    return Math.min(plasmoid.configuration.maxEventDots, root.eventDates[root.dateKey(d)] || 0);
                                 }
                                 delegate: Rectangle {
                                     width: 4; height: 4; radius: 2
-                                    color: "#FF9F0A"
+                                    color: plasmoid.configuration.eventColorHex
                                 }
                             }
                             Item {
@@ -218,7 +218,7 @@ PlasmoidItem {
                                 width: Math.min(dayCell.width, dayCell.height) - 4
                                 height: width
                                 radius: width / 2
-                                color: "#5AC8FA"
+                                color: plasmoid.configuration.todayColorHex
                             }
 
                             Text {
@@ -237,7 +237,7 @@ PlasmoidItem {
                                 anchors.bottomMargin: 2
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 width: 4; height: 4; radius: 2
-                                color: "#FF9F0A"
+                                color: plasmoid.configuration.eventColorHex
                             }
                         }
                     }
