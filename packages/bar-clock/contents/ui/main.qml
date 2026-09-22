@@ -36,12 +36,13 @@ PlasmoidItem {
         Layout.minimumWidth: 220
         Layout.minimumHeight: 100
 
-        GlassCard {
+        Rectangle {
             anchors.fill: parent
             anchors.margins: 10
-            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
-            blurAmount: plasmoid.configuration.glassBlur
-            tintOpacity: plasmoid.configuration.glassTintOpacity
+            color: "#1a1a1a"
+            radius: 22
+            opacity: 0.96
+            clip: true
 
             ColumnLayout {
                 anchors.fill: parent
@@ -51,7 +52,7 @@ PlasmoidItem {
                 Text {
                     text: root.pad(root.hours) + ":" + root.pad(root.minutes)
                     color: "white"
-                    font.pixelSize: plasmoid.configuration.clockFontSize
+                    font.pixelSize: 26
                     font.bold: true
                     Layout.alignment: Qt.AlignHCenter
                 }
@@ -66,21 +67,21 @@ PlasmoidItem {
                         label: "H"
                         value: root.hours
                         max: 24
-                        color: plasmoid.configuration.hourColorHex
+                        color: "#FF9F0A"
                     }
                     BarRow {
                         Layout.fillWidth: true
                         label: "M"
                         value: root.minutes
                         max: 60
-                        color: plasmoid.configuration.minuteColorHex
+                        color: "#5AC8FA"
                     }
                     BarRow {
                         Layout.fillWidth: true
                         label: "S"
                         value: root.seconds
                         max: 60
-                        color: plasmoid.configuration.secondColorHex
+                        color: "#34C759"
                     }
                 }
             }

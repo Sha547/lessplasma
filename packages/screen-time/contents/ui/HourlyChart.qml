@@ -9,7 +9,7 @@ Item {
 
     // Cap chart axis so typical activity fills the bars instead of being
     // squashed by one outlier hour. Bars exceeding the cap simply hit the top.
-    property real chartCap: 1800   // 30 min, which most hours of normal use fit inside
+    property real chartCap: 1800   // 30 min — most hours of normal use fit nicely
 
     readonly property real _maxBucket: {
         var m = 0;

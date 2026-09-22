@@ -17,12 +17,4 @@ if [[ ! -d "packages/$1" ]]; then
     exit 1
 fi
 
-# Named plasmoidviewer6 on some distros, plain plasmoidviewer on others (Neon, Arch).
-VIEWER=$(command -v plasmoidviewer6 || command -v plasmoidviewer || true)
-
-if [[ -z "$VIEWER" ]]; then
-    echo "[!] plasmoidviewer not found. Install plasma-sdk"
-    exit 1
-fi
-
-"$VIEWER" -a "packages/$1"
+plasmoidviewer6 -a "packages/$1"

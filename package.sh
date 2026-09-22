@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# lessplasma: bundle each widget into a distributable .plasmoid file.
+# lessplasma — bundle each widget into a distributable .plasmoid file.
 # Output goes into packaged/<widget>-<version>.plasmoid
 
 set -e
@@ -45,7 +45,7 @@ package_widget() {
     trap "rm -rf $TMP" RETURN
 
     echo "[*] Copying widget files..."
-    # Follow symlinks; exclude daemon/ (Screen Time only, not part of plasmoid spec).
+    # Follow symlinks; exclude daemon/ (Screen Time only — not part of plasmoid spec).
     tar -C "$DIR" -chf - --exclude=daemon . | tar -C "$TMP" -xf -
 
     echo "[*] Removing dev cruft..."

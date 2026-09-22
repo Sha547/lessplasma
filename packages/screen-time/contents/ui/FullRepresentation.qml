@@ -14,13 +14,14 @@ Item {
     readonly property bool showApps: height > 410
     readonly property int appsToShow: height > 480 ? 4 : 2
 
-    GlassCard {
+    Rectangle {
         id: card
         anchors.fill: parent
         anchors.margins: 10
-        cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
-        blurAmount: plasmoid.configuration.glassBlur
-        tintOpacity: plasmoid.configuration.glassTintOpacity
+        color: "#1a1a1a"
+        radius: 28
+        opacity: 0.97
+        clip: true
 
         ColumnLayout {
             anchors.fill: parent
@@ -42,7 +43,6 @@ Item {
                 hourlyData: root.hourly
                 categories: root.categories
                 maxSeconds: 3600
-                chartCap: plasmoid.configuration.chartCapMinutes * 60
             }
 
             RowLayout {
@@ -52,7 +52,7 @@ Item {
                 visible: full.showCategories
 
                 Repeater {
-                    model: full.showCategories ? Math.min(plasmoid.configuration.maxCategoryChips, root.categories.length) : 0
+                    model: full.showCategories ? Math.min(3, root.categories.length) : 0
                     delegate: ColumnLayout {
                         required property int index
                         Layout.fillWidth: true
@@ -91,7 +91,7 @@ Item {
                 visible: full.showApps
 
                 Repeater {
-                    model: full.showApps ? root.topApps.slice(0, Math.min(full.appsToShow, plasmoid.configuration.topCount)) : []
+                    model: full.showApps ? root.topApps.slice(0, full.appsToShow) : []
                     delegate: RowLayout {
                         required property var modelData
                         Layout.fillWidth: true

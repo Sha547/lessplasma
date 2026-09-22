@@ -6,23 +6,5 @@
         <entry name="noteText" type="String">
             <default></default>
         </entry>
-        <entry name="autosaveDebounceMs" type="Int">
-            <default>600</default>
-        </entry>
-        <entry name="fontSize" type="Int">
-            <default>14</default>
-        </entry>
-        <entry name="tintColorHex" type="String">
-            <default>#0d0d10</default>
-        </entry>
-        <entry name="glassBlur" type="Double">
-            <default>1.0</default>
-        </entry>
-        <entry name="glassTintOpacity" type="Double">
-            <default>0.42</default>
-        </entry>
-        <entry name="cornerRadius" type="Int">
-            <default>24</default>
-        </entry>
     </group>
 </kcfg>

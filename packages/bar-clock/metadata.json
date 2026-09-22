@@ -2,10 +2,7 @@
     "KPackageStructure": "Plasma/Applet",
     "KPlugin": {
         "Authors": [
-            {
-                "Email": "shafsquare54@gmail.com",
-                "Name": "sha5"
-            }
+            { "Email": "shafsquare54@gmail.com", "Name": "sha5" }
         ],
         "Category": "Date and Time",
         "Description": "Hours, minutes, seconds as filling bars.",
@@ -13,7 +10,7 @@
         "Id": "com.sha5.widgets.barclock",
         "License": "GPL-3.0-or-later",
         "Name": "Bar Clock",
-        "Version": "2.0"
+        "Version": "0.1"
     },
     "X-Plasma-API-Minimum-Version": "6.0"
 }

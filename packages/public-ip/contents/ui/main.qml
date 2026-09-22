@@ -65,10 +65,9 @@ PlasmoidItem {
         }
 
         function refresh() {
-            var safeRegex = plasmoid.configuration.vpnRegex.replace(/'/g, "'\\''");
             var cmd =
                 'VPN=0; ' +
-                "if ip link show 2>/dev/null | grep -qE '" + safeRegex + "'; then VPN=1; fi; " +
+                'if ip link show 2>/dev/null | grep -qE "tun[0-9]+|wg[0-9]+|tap[0-9]+|nordlynx"; then VPN=1; fi; ' +
                 'echo "vpn=$VPN"; ' +
                 'BODY=$(curl -sf --max-time 5 https://ipinfo.io/json 2>/dev/null); ' +
                 'if [ -n "$BODY" ]; then ' +
@@ -86,7 +85,7 @@ PlasmoidItem {
     }
 
     Timer {
-        interval: plasmoid.configuration.refreshSeconds * 1000
+        interval: 60 * 1000
         running: true
         repeat: true
         triggeredOnStart: true
@@ -101,12 +100,13 @@ PlasmoidItem {
 
         readonly property bool wide: width >= 280
 
-        GlassCard {
+        Rectangle {
             anchors.fill: parent
             anchors.margins: 10
-            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
-            blurAmount: plasmoid.configuration.glassBlur
-            tintOpacity: plasmoid.configuration.glassTintOpacity
+            color: "#1a1a1a"
+            radius: height / 2
+            opacity: 0.95
+            clip: true
 
             RowLayout {
                 anchors.fill: parent
@@ -118,7 +118,7 @@ PlasmoidItem {
                     width: 8
                     height: 8
                     radius: 4
-                    color: root.vpn ? plasmoid.configuration.vpnColorHex : plasmoid.configuration.directColorHex
+                    color: root.vpn ? "#34C759" : "#FF9F0A"
                     Layout.alignment: Qt.AlignVCenter
                 }
 

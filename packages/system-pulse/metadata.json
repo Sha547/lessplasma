@@ -2,10 +2,7 @@
     "KPackageStructure": "Plasma/Applet",
     "KPlugin": {
         "Authors": [
-            {
-                "Email": "shafsquare54@gmail.com",
-                "Name": "sha5"
-            }
+            { "Email": "shafsquare54@gmail.com", "Name": "sha5" }
         ],
         "Category": "System Information",
         "Description": "CPU, RAM and network bars in a minimal pill.",
@@ -13,7 +10,7 @@
         "Id": "com.sha5.widgets.systempulse",
         "License": "GPL-3.0-or-later",
         "Name": "System Pulse",
-        "Version": "2.0"
+        "Version": "0.1"
     },
     "X-Plasma-API-Minimum-Version": "6.0"
 }

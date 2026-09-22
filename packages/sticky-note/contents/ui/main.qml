@@ -16,13 +16,12 @@ PlasmoidItem {
         Layout.minimumWidth: 200
         Layout.minimumHeight: 200
 
-        GlassCard {
+        Rectangle {
             anchors.fill: parent
             anchors.margins: 10
-            cornerRadius: Math.min(plasmoid.configuration.cornerRadius, height / 2)
-            tintColor: plasmoid.configuration.tintColorHex
-            blurAmount: plasmoid.configuration.glassBlur
-            tintOpacity: plasmoid.configuration.glassTintOpacity
+            color: "#1a1a1a"
+            radius: 24
+            opacity: 0.95
 
             ColumnLayout {
                 anchors.fill: parent
@@ -46,7 +45,7 @@ PlasmoidItem {
                         id: editor
                         text: plasmoid.configuration.noteText
                         color: "white"
-                        font.pixelSize: plasmoid.configuration.fontSize
+                        font.pixelSize: 14
                         wrapMode: TextArea.Wrap
                         selectByMouse: true
                         background: null
@@ -55,7 +54,7 @@ PlasmoidItem {
 
                         Timer {
                             id: saveTimer
-                            interval: plasmoid.configuration.autosaveDebounceMs
+                            interval: 600
                             onTriggered: plasmoid.configuration.noteText = editor.text
                         }
 
